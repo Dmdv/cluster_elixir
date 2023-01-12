@@ -7,7 +7,18 @@ defmodule ClusterElixir.Application do
 
   @impl true
   def start(_type, _args) do
+    topologies = [
+      default: [
+        strategy: Cluster.Strategy.Kubernetes.DNS,
+        config: [
+          service: "my-elixir-app-svc-headless",
+          application_name: "my_app"
+        ]
+      ]
+    ]
+
     children = [
+      {Cluster.Supervisor, [topologies, [name: ClusterElixir.ClusterSupervisor]]},
       # Starts a worker by calling: ClusterElixir.Worker.start_link(arg)
       # {ClusterElixir.Worker, arg}
     ]

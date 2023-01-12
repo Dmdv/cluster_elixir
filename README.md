@@ -1,6 +1,32 @@
-# ClusterElixir
+# Automatic Cluster Formation and Healing
 
-**TODO: Add description**
+libcluster is a library that provides a mechanism for automatically forming clusters of Erlang nodes, with either static or dynamic node membership.
+It provides a pluggable “strategy” system, with a variety of strategies provided out of the box. The one we care about is the Kubernetes DNS strategy.
+Using this strategy, libcluster will perform a DNS query against a headless Kubernetes Service, getting the IP address of all 
+Pods running our Erlang cluster:
+
+```docker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-elixir-app-svc-headless
+  namespace: default
+  labels:
+    app.kubernetes.io/name: my-elixir-app
+    app.kubernetes.io/instance: myapp-svc-headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 4369
+      targetPort: epmd
+      protocol: TCP
+      name: epmd
+  selector:
+    app.kubernetes.io/name: my-elixir-app
+    app.kubernetes.io/instance: myapp-node
+```
 
 ## Installation
 
